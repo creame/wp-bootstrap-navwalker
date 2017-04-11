@@ -71,9 +71,9 @@ if ( ! class_exists( 'WP_Bootstrap_Navwalker' ) ) {
 			* a 0 if the strings are equal.
 		 	*/
 			if ( 0 === strcasecmp( $item->attr_title, 'divider' ) && 1 === $depth ) {
-				$output .= $indent . '<li role="presentation" class="divider">';
+				$output .= $indent . '<li role="presentation" class="dropdown-divider">';
 			} elseif ( 0 === strcasecmp( $item->title, 'divider' ) && 1 === $depth ) {
-				$output .= $indent . '<li role="presentation" class="divider">';
+				$output .= $indent . '<li role="presentation" class="dropdown-divider">';
 			} elseif ( 0 === strcasecmp( $item->attr_title, 'dropdown-header' ) && 1 === $depth ) {
 				$output .= $indent . '<li role="presentation" class="dropdown-header">' . esc_attr( $item->title );
 			} elseif ( 0 === strcasecmp( $item->attr_title, 'disabled' ) ) {
@@ -83,14 +83,18 @@ if ( ! class_exists( 'WP_Bootstrap_Navwalker' ) ) {
 				$classes = empty( $item->classes ) ? array() : (array) $item->classes;
 				$classes[] = 'menu-item-' . $item->ID;
 				$class_names = join( ' ', apply_filters( 'nav_menu_css_class', array_filter( $classes ), $item, $args ) );
+				// clear all classes
+				$class_names = 'nav-item menu-item-' . sanitize_title($item->title);
 				if ( $args->has_children ) {
 					$class_names .= ' dropdown'; }
 				if ( in_array( 'current-menu-item', $classes, true ) ) {
 					$class_names .= ' active'; }
 				$class_names = $class_names ? ' class="' . esc_attr( $class_names ) . '"' : '';
-				$id = apply_filters( 'nav_menu_item_id', 'menu-item-' . $item->ID, $item, $args );
-				$id = $id ? ' id="' . esc_attr( $id ) . '"' : '';
-				$output .= $indent . '<li itemscope="itemscope" itemtype="https://www.schema.org/SiteNavigationElement"' . $id . $value . $class_names . '>';
+				// more clean markup
+				// $id = apply_filters( 'nav_menu_item_id', 'menu-item-' . $item->ID, $item, $args );
+				// $id = $id ? ' id="' . esc_attr( $id ) . '"' : '';
+				// $output .= $indent . '<li itemscope="itemscope" itemtype="https://www.schema.org/SiteNavigationElement"' . $id . $value . $class_names . '>';
+				$output .= $indent . '<li ' . $value . $class_names . '>';
 				$atts = array();
 
 				if ( empty( $item->attr_title ) ) {
@@ -103,12 +107,13 @@ if ( ! class_exists( 'WP_Bootstrap_Navwalker' ) ) {
 				$atts['rel']    = ! empty( $item->xfn )		? $item->xfn	: '';
 				// If item has_children add atts to a.
 				if ( $args->has_children && 0 === $depth ) {
-					$atts['href']   		= '#';
+					$atts['href']   	= '#';
 					$atts['data-toggle']	= 'dropdown';
-					$atts['class']			= 'dropdown-toggle';
+					$atts['class']		= 'nav-link dropdown-toggle';
 					$atts['aria-haspopup']	= 'true';
 				} else {
 					$atts['href'] = ! empty( $item->url ) ? $item->url : '';
+					$atts['class'] = 'nav-link';
 				}
 				$atts = apply_filters( 'nav_menu_link_attributes', $atts, $item, $args );
 				$attributes = '';
